@@ -7,43 +7,6 @@ public class Main_BJ_1966_프린터큐 {
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static void solve() throws IOException {
-        StringTokenizer NM = new StringTokenizer(bufferedReader.readLine());
-        Queue<Integer> queue = new LinkedList<>();
-        int N = Integer.parseInt(NM.nextToken());
-        int M = Integer.parseInt(NM.nextToken()) + 1;
-        StringTokenizer importantString = new StringTokenizer(bufferedReader.readLine());
-        ArrayList<Integer> importants = new ArrayList<>();
-        for(int i = 1 ; i <= N; i++) {
-            importants.add(Integer.parseInt(importantString.nextToken()));
-            queue.add(i);
-        }
-        if(N == 1) {
-            bufferedWriter.write("1\n");
-            return;
-        }
-        int count = 0;
-        while(queue.size() > 0) {
-            int max = 0;
-            System.out.println(queue.toString());
-            for(int i = 1; i < importants.size(); i++) {
-                if(max < importants.get(i)) {
-                    max = importants.get(i);
-                }
-            }
-            importants.remove(max);
-            if(importants.get(queue.peek()) < max) {
-                queue.add(queue.poll());
-            }
-            else {
-                if(queue.poll() == M) {
-                    bufferedWriter.write(count+"\n");
-                    break;
-                }
-                count++;
-            }
-        }
-    }
 
     public static void main(String[] args) throws IOException {
         int T = Integer.parseInt(bufferedReader.readLine());
@@ -52,5 +15,48 @@ public class Main_BJ_1966_프린터큐 {
         }
         bufferedWriter.close();
         bufferedReader.close();
+    }
+
+    private static void solve() throws IOException {
+        StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
+        int N = Integer.parseInt(stringTokenizer.nextToken());
+        int M = Integer.parseInt(stringTokenizer.nextToken());
+        int[] importantType = new int[10];
+        int[] importants = new int[N];
+        StringTokenizer importantString = new StringTokenizer(bufferedReader.readLine());
+        Queue<int[]> queue = new LinkedList<>();
+        int maxImportant = 0;
+        for(int i = 0; i < N; i++) {
+            importants[i] = Integer.parseInt(importantString.nextToken());
+            importantType[importants[i]]++;
+            if(maxImportant < importants[i]) {
+                maxImportant = importants[i];
+            }
+            queue.add(new int[] {i, importants[i]});
+        }
+        while(true) {
+            int idx = queue.peek()[0];
+            int important = queue.peek()[1];
+
+            queue.remove();
+            if(important != maxImportant) {
+                queue.add(new int[] {idx, important});
+            }
+            else {
+                if(idx == M) {
+                    bufferedWriter.write( N - queue.size() + "\n");
+                    return;
+                }
+                importantType[important]--;
+                if(importantType[important] == 0) {
+                    for(int i = important; i >= 1; i--) {
+                        if(importantType[i] > 0) {
+                            maxImportant = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
