@@ -15,39 +15,51 @@ public class boj_풍선터트리기_심정욱 {
         for(int i = 0 ; i < N ; i++) {
             deque.addLast(new int[] {i+1, Integer.parseInt(stringTokenizer.nextToken())});
         }
-        // deque : [1,3], [2,2], [3,1], [4,-3], [5,-1]
-        // temp :
-
-        // deque :
         while(!deque.isEmpty()) {
-            int[] peekArr = deque.pollFirst();
-            int idx = peekArr[0];
-            int value = peekArr[1];
-            bufferedWriter.write(idx + " ");
-            if(value > 0) {
-                value -= 1;
-                while(value > 0) {
-                    if(!deque.isEmpty()) {
-                        temp.addLast(deque.pollFirst());
+            int idx = deque.peekFirst()[0];
+            int val = deque.peekFirst()[1];
+            boolean isFirst = true;
+            if(val > 0) {
+                while(val > 0) {
+                    System.out.println("deque");
+                    for(int[] arr : deque) {
+                        System.out.print(Arrays.toString(arr) + " ");
+                    }
+                    System.out.println("\n========");
+                    System.out.println("temp");
+                    for(int[] arr : temp) {
+                        System.out.print(Arrays.toString(arr) + " ");
+                    }
+                    System.out.println("\n========");
+                    if(isFirst) {
+                        bufferedWriter.write(idx+ " ");
+                        deque.pollFirst();
+                        isFirst = false;
                     }
                     else {
-                        deque.addFirst(temp.pollLast());
                     }
-                    value--;
+                    val--;
                 }
             }
             else {
-                value += 1;
-                while(value < 0) {
-                    if(!temp.isEmpty()) {
-                        deque.addLast(temp.pollFirst());
+                while(val < 0) {
+                    if(isFirst) {
+                        bufferedWriter.write(idx+ " ");
+                        deque.pollFirst();
+                        isFirst = false;
+                    } else {
+                        if(!temp.isEmpty()) {
+                            deque.addFirst(temp.pollLast());
+                        }
+                        else if(!deque.isEmpty()){
+                            deque.addFirst(deque.pollLast());
+                        }
+                        val++;
                     }
-                    else {
-                        deque.addLast(deque.pollFirst());
-                    }
-                    value++;
+
                 }
             }
+
         }
         bufferedWriter.close();
         bufferedReader.close();
