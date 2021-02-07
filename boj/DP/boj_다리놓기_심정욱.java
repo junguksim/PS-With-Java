@@ -19,6 +19,10 @@ public class boj_다리놓기_심정욱 {
         for(int m = 1; m <= M; m++) {
             dp[1][m] = m;
         }
+        // a b
+        // a b
+        //   b
+        //   b
         for(int i = 2; i <= N; i++) {
             for(int j = 2; j <= M; j++) {
                 dp[i][j] = dp[i][j-1] + dp[i-1][j-1];
