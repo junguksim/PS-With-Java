@@ -45,10 +45,9 @@ public class boj_유기농배추_심정욱 {
                 if(nx < 0 || ny < 0 || nx >= M || ny >= N) {
                     continue;
                 }
-                if(visited[ny][nx] || field[ny][nx] == 0) {
+                if(visited[ny][nx] || field[nx][ny] == 0) {
                     continue;
                 }
-
                 queue.add(new int[] {nx, ny});
                 visited[ny][nx] = true;
             }
