@@ -1,7 +1,6 @@
 package boj.브루트포스;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class boj_도영이가만든맛있는음식_심정욱 {
