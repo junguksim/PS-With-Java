@@ -1,15 +1,13 @@
 package boj.구현;
 
 import java.io.*;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class boj_캐슬디펜스_심정욱 {
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     static int N,M,D, answer, enemyCnt;
-    static ArrayList<Node> enemies, enemiesTemp;
-    static int[][] map, mapTemp, es;
+    static ArrayList<Node> deletePoints;
+    static int[][] map, mapTemp;
     static int[] sniperPositions;
     static boolean[][] visited;
     static int[] dx = {-1,0,0};
@@ -26,35 +24,41 @@ public class boj_캐슬디펜스_심정욱 {
             this.depth = depth;
         }
     }
+    public static void main(String[] args) throws IOException {
+        input();
+        solve();
+        bufferedReader.close();
+    }
 
     static void input() throws IOException {
         StringTokenizer nmd = new StringTokenizer(bufferedReader.readLine());
         N = Integer.parseInt(nmd.nextToken());
         M = Integer.parseInt(nmd.nextToken());
         D = Integer.parseInt(nmd.nextToken());
-        enemies = new ArrayList<>();
-        enemiesTemp = new ArrayList<>();
         map = new int[N+1][M];
         mapTemp = new int[N+1][M];
         answer = Integer.MIN_VALUE;
         sniperPositions = new int[3];
+        deletePoints = new ArrayList<>();
         for(int i = 0; i< N; i++) {
             StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
             for(int j = 0; j < M; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
                 if(map[i][j] == 1) {
-                    enemies.add(new Node(i, j, 0));
+                    enemyCnt++;
                 }
             }
         }
-        enemyCnt = enemies.size();
+    }
+
+    static void solve() {
+        makeCombination(0,0);
+        System.out.println(answer);
     }
 
     static void makeCombination(int cnt, int start) {
         if(cnt == 3) {
-            System.out.println(Arrays.toString(sniperPositions));
             int sum = getKilledEnemiesCount();
-            System.out.println("최종 죽인 몬스터 수 : " + sum);
             answer = Math.max(answer,sum );
             return;
         }
@@ -70,39 +74,73 @@ public class boj_캐슬디펜스_심정욱 {
         }
     }
 
-    static void mapPrint() {
-        System.out.println("========map========");
-        for(int i = 0 ; i < N; i++) {
-            for(int j = 0 ; j < M; j++) {
-                System.out.print(map[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("================");
-        System.out.println("========mapTemp========");
-        for(int i = 0 ; i < N; i++) {
-            for(int j = 0 ; j < M; j++) {
-                System.out.print(mapTemp[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("================");
-    }
     static int getKilledEnemiesCount() {
         int sum = 0;
         int enemyCount = enemyCnt;
-        mapCopy();
+        mapCopy(); // mapTemp 에 map 의 형태를 담아서 궁수의 위치 조합마다 실행될 수 있게 함
         while(enemyCount > 0) {
-            //mapPrint();
-            int deletedByShoot = shoot();
+            int deletedByShoot = shoot(); // 사격 후 죽은 숫자
             sum += deletedByShoot;
             enemyCount -= deletedByShoot;
-            //System.out.println("쏴서 죽은 몹 : " + deletedByShoot);
             int deletedByMove = enemyMove();
             enemyCount -= deletedByMove;
-            //System.out.println("움직여서 죽은 몹 : " + deletedByMove);
         }
         return sum;
+    }
+
+    static int shoot() {
+        int deleteByShootCount = 0;
+        deletePoints = new ArrayList<>();
+        for (int sniperPosition : sniperPositions) {
+            bfs(N - 1, sniperPosition); // 항상 성안에 있으므로 x는 N-1 고정
+        }
+        for(Node deletePoint : deletePoints) {
+            if(mapTemp[deletePoint.x][deletePoint.y] == 1) {
+                mapTemp[deletePoint.x][deletePoint.y] = 0;
+                deleteByShootCount++;
+            }
+        }
+        return deleteByShootCount;
+    }
+    static void bfs(int sx, int sy) {
+        visited = new boolean[N+1][M];
+        int killX = N;
+        int killY = M;
+        int killD = N + M;
+        Queue<Node> queue = new LinkedList<>();
+        visited[sx][sy] = true;
+        queue.add(new Node(sx, sy, 1));
+        while (!queue.isEmpty()) {
+            Node sniper = queue.poll();
+            int x = sniper.x;
+            int y = sniper.y;
+            int d = sniper.depth;
+            if(d > D) {
+                break;
+            }
+            if(mapTemp[x][y] == 1) {
+                if(killY > y && killD >= d) {
+                    killX = x;
+                    killY = y;
+                    killD = d;
+                }
+            }
+            for(int i = 0 ; i <3 ; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if(nx < 0 || ny < 0 || nx >= N|| ny >= M) {
+                    continue;
+                }
+                if(visited[nx][ny]) {
+                    continue;
+                }
+                visited[nx][ny] = true;
+                queue.add(new Node(nx, ny, d + 1));
+            }
+        }
+        if(killX < N && killY < M && killD <= D) {
+            deletePoints.add(new Node(killX, killY, killD));
+        }
     }
 
     static void swapLine(int i, int j) {
@@ -123,64 +161,5 @@ public class boj_캐슬디펜스_심정욱 {
             swapLine(i, i+1);
         }
         return sum;
-    }
-
-    static int shoot() {
-        int deleteByShootCount = 0;
-        for (int sniperPosition : sniperPositions) {
-            //System.out.printf("%d,%d에 있는 궁수 사격 시작\n", N, sniperPosition);
-            deleteByShootCount += bfs(N - 1, sniperPosition); // 항상 성안에 있으므로 x는 N-1 고정
-        }
-        return deleteByShootCount;
-    }
-    static int bfs(int sx, int sy) {
-        visited = new boolean[N+1][M];
-        int killX = N;
-        int killY = M;
-        Queue<Node> queue = new LinkedList<>();
-        visited[sx][sy] = true;
-        queue.add(new Node(sx, sy, 1));
-        while (!queue.isEmpty()) {
-            Node sniper = queue.poll();
-            int x = sniper.x;
-            int y = sniper.y;
-            int d = sniper.depth;
-            if(d > D) {
-                break;
-            }
-            if(mapTemp[x][y] == 1) {
-                if(killY > y) {
-                    killX = x;
-                    killY = y;
-                }
-            }
-            for(int i = 0 ; i <3 ; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-                if(nx < 0 || ny < 0 || nx >= N|| ny >= M) {
-                    continue;
-                }
-                if(visited[nx][ny]) {
-                    continue;
-                }
-                visited[nx][ny] = true;
-                queue.add(new Node(nx, ny, d + 1));
-            }
-        }
-        if(killX < N && killY < M) {
-            mapTemp[killX][killY] = 0;
-            return 1;
-        }
-        return 0;
-    }
-
-    static void solve() {
-        makeCombination(0,0);
-        System.out.println(answer);
-    }
-
-    public static void main(String[] args) throws IOException {
-        input();
-        solve();
     }
 }
