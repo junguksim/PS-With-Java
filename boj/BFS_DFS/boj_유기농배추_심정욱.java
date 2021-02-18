@@ -1,7 +1,6 @@
-package boj.BFS;
+package boj.BFS_DFS;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;

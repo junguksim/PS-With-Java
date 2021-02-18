@@ -1,7 +1,6 @@
-package boj.BFS;
+package boj.BFS_DFS;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class boj_늑대와양_심정욱 {

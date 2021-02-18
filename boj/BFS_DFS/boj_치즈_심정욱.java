@@ -1,4 +1,4 @@
-package boj.BFS;
+package boj.BFS_DFS;
 
 import java.io.*;
 import java.util.LinkedList;
