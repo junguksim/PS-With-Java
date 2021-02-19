@@ -2,14 +2,15 @@ package jungol;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
 public class jungol_냉장고_심정욱 {
     static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-    static int N, cnt;
-    static ArrayList<Temp> temps;
+    static int N, cnt = 1;
+    static Temp[] temps;
 
     static class Temp implements Comparable<Temp>{
         int min;
@@ -22,35 +23,28 @@ public class jungol_냉장고_심정욱 {
 
         @Override
         public int compareTo(Temp o) {
-            if (this.min > o.min) {
-                return 1;
-            }
-            return -1;
+            return this.max - o.max;
         }
     }
 
 
     static void input() throws IOException {
         N = Integer.parseInt(bufferedReader.readLine());
-        temps = new ArrayList<>();
+        temps = new Temp[N];
         for(int i = 0 ; i < N; i++) {
             StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
-            temps.add(new Temp(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())));
+            temps[i] = new Temp(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
         }
-        Collections.sort(temps);
+        Arrays.sort(temps);
     }
 
     static void solve() {
-        while(!temps.isEmpty()) {
-            Temp t = temps.remove(0);
-            int tMax = t.max;
-            cnt++;
-            while(!temps.isEmpty()) {
-                Temp k = temps.get(0);
-                if(k.min > tMax) {
-                    break;
-                }
-                temps.remove(0);
+        ArrayList<Temp> list = new ArrayList<>();
+        list.add(temps[0]);
+        for(int i = 1; i < N; i++) {
+            if(list.get(list.size() - 1).max < temps[i].min) {
+                list.add(temps[i]);
+                cnt++;
             }
         }
         System.out.println(cnt);
