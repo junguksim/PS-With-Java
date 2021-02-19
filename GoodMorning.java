@@ -73,11 +73,11 @@ public class GoodMorning {
             return;
         }
         for(int i = 0; i < N; i++) {
-            if(visited[cnt]) continue;
+            if(visited[i]) continue;
             arr[cnt] = input[i];
-            visited[cnt] = true;
+            visited[i] = true;
             makePermutation(cnt+1, arr, visited);
-            visited[cnt]= false;
+            visited[i]= false;
         }
     }
 
