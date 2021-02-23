@@ -35,17 +35,17 @@ public class GoodMorning {
     private static void makeSubset(int cnt, boolean[] isSelected) {
         if(cnt == N) {
             for(int i = 0 ; i < N; i++) {
-                if(isSelected[i]) {
-                    System.out.print(input[i] + " ");
-                }
+                if(isSelected[i]) System.out.print(input[i] + " ");
             }
             System.out.println();
             return;
         }
-        isSelected[cnt] = true;
-        makeSubset(cnt+1, isSelected);
-        isSelected[cnt] = false;
-        makeSubset(cnt+1, isSelected);
+        for(int i = 0; i < N; i++) {
+            isSelected[cnt] = true;
+            makeSubset(cnt+1, isSelected);
+            isSelected[cnt] = false;
+            makeSubset(cnt+1, isSelected);
+        }
     }
 
     private static void makeCombination(int cnt, int start ,int[] arr) {
@@ -58,16 +58,14 @@ public class GoodMorning {
         }
         for(int i = start; i < N; i++) {
             arr[cnt] = input[i];
-            makeCombination(cnt + 1, i + 1, arr);
+            makeCombination(cnt+1, i + 1, arr);
         }
     }
 
     static void makePermutation(int cnt, int[] arr, boolean[] visited) {
         if(cnt == N) {
             for(int i = 0 ; i < N; i++) {
-                if(visited[i]) {
-                    System.out.print(arr[i]+ " ");
-                }
+                if(visited[i]) System.out.print(arr[i] + " ");
             }
             System.out.println();
             return;
@@ -77,7 +75,7 @@ public class GoodMorning {
             arr[cnt] = input[i];
             visited[i] = true;
             makePermutation(cnt+1, arr, visited);
-            visited[i]= false;
+            visited[i] = false;
         }
     }
 
