@@ -34,23 +34,21 @@ public class GoodMorning {
     }//main
     private static void makeSubset(int cnt, boolean[] isSelected) {
         if(cnt == N) {
-            for(int i = 0 ; i < N; i++) {
+            for(int i = 0; i < N;i++) {
                 if(isSelected[i]) System.out.print(input[i] + " ");
             }
             System.out.println();
             return;
         }
-        for(int i = 0; i < N; i++) {
-            isSelected[cnt] = true;
-            makeSubset(cnt+1, isSelected);
-            isSelected[cnt] = false;
-            makeSubset(cnt+1, isSelected);
-        }
+        isSelected[cnt] = true;
+        makeSubset(cnt+1, isSelected);
+        isSelected[cnt] = false;
+        makeSubset(cnt+1, isSelected); // 부분집합은 for문 들어가지 않음!!!!!!!
     }
 
     private static void makeCombination(int cnt, int start ,int[] arr) {
         if(cnt == R) {
-            for(int i = 0 ; i < R; i++) {
+            for(int i = 0; i < R; i++) {
                 System.out.print(arr[i] + " ");
             }
             System.out.println();
@@ -58,7 +56,7 @@ public class GoodMorning {
         }
         for(int i = start; i < N; i++) {
             arr[cnt] = input[i];
-            makeCombination(cnt+1, i + 1, arr);
+            makeCombination(cnt+1, i+1, arr);
         }
     }
 
@@ -70,10 +68,10 @@ public class GoodMorning {
             System.out.println();
             return;
         }
-        for(int i = 0; i < N; i++) {
+        for(int i = 0 ; i < N; i++) {
             if(visited[i]) continue;
+            visited[i]=true;
             arr[cnt] = input[i];
-            visited[i] = true;
             makePermutation(cnt+1, arr, visited);
             visited[i] = false;
         }
