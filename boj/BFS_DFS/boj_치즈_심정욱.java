@@ -1,65 +1,107 @@
 package boj.BFS_DFS;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class boj_치즈_심정욱 {
-    static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-    static int width, height;
-    static int[][] board;
-    static int[][] direct = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
-    static boolean[][] visited;
-    // 바깥부터 접근해야함
-    // 안쪽의 공백은 하면안됨
-    public static void bfs(int sy, int sx) {
-        Queue<int[]> queue = new LinkedList<>();
-        queue.add(new int[]{sx,sy});
-        visited[sy][sx] = true;
-        while(!queue.isEmpty()) {
-            int x = queue.peek()[0];
-            int y = queue.peek()[1];
-            queue.remove();
+    static int R,C;
+    static int[][] map;
+    static int[] dx = {-1,1,0,0};
+    static int[] dy = {0,0,-1,1};
+    static ArrayList<Node> cheeses;
 
-            for(int i = 0 ; i < 4; i++) {
-                int nx = x + direct[i][0];
-                int ny = y + direct[i][1];
+    static class Node {
+        int x;
+        int y;
 
-                if(nx < 0 || ny < 0 || nx >= width || ny >= height) {
-                    continue;
+        public Node(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+
+    static void input() throws IOException {
+        StringTokenizer rc = new StringTokenizer(bufferedReader.readLine());
+        R = Integer.parseInt(rc.nextToken());
+        C = Integer.parseInt(rc.nextToken());
+        map = new int[R][C];
+        cheeses = new ArrayList<>();
+        for(int i = 0; i < R; i++) {
+            StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
+            for(int j = 0; j < C; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                if(map[i][j] == 1) {
+                    cheeses.add(new Node(i, j));
                 }
-                if(board[ny][nx] >= 1) {
-                    board[ny][nx] = 2;
-
-                }
-                queue.add(new int[] {nx, ny});
             }
         }
+    }
 
+    static boolean bfs(Node start, boolean[][] visited) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(start);
+        while(!queue.isEmpty()) {
+            Node s = queue.poll();
+            int x = s.x;
+            int y = s.y;
+            visited[x][y] = true;
+            for(int i = 0 ; i < 4; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if(nx < 0 || ny < 0 || nx >= R || ny >= C) {
+                    return true;
+                }
+                if(visited[nx][ny] || map[nx][ny] >= 1) continue;
+                queue.add(new Node(nx, ny));
+                visited[nx][ny] = true;
+            }
+        }
+        return false;
+    }
+
+    static void printMap() {
+        for(int i = 0; i < R; i++) {
+            for(int j = 0; j < C; j++) {
+                System.out.print(map[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    static void solve() {
+        int count = 0;
+        int time = 0;
+        while (!cheeses.isEmpty()) {
+            ArrayList<Node> newCheeses = new ArrayList<>();
+            ArrayList<Node> deleteCheeses = new ArrayList<>();
+            for(Node cheese : cheeses) {
+                if(!bfs(cheese, new boolean[R][C])) {
+                    newCheeses.add(cheese);
+                } else {
+                    deleteCheeses.add(cheese);
+                }
+            }
+            for(Node cheese : deleteCheeses) {
+                map[cheese.x][cheese.y] = 0;
+            }
+            count = cheeses.size();
+            cheeses = newCheeses;
+            time++;
+//            printMap();
+//            System.out.println("=================");
+        }
+        System.out.println(time);
+        System.out.println(count);
     }
 
     public static void main(String[] args) throws IOException {
-        StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
-        height = Integer.parseInt(st.nextToken());
-        width = Integer.parseInt(st.nextToken());
-        board = new int[height][width];
-        visited = new boolean[height][width];
-        for(int i = 0 ; i < height; i++) {
-            st = new StringTokenizer(bufferedReader.readLine());
-            for(int j = 0; j < width; j++) {
-                int num = Integer.parseInt(st.nextToken());
-                board[i][j] = num;
-            }
-        }
-        int time = 0;
-        bfs(0,0);
-        bfs(0,width-1);
-        bfs(height-1, 0);
-        bfs(height-1, width-1);
-        System.out.println(time);
+        input();
+        solve();
         bufferedReader.close();
-        bufferedWriter.close();
     }
 }
