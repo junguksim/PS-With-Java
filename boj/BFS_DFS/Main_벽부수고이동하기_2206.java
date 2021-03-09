@@ -1,13 +1,11 @@
 package boj.BFS_DFS;
 import java.io.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main_벽부수고이동하기_2206 {
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     static int N,M, ans = Integer.MAX_VALUE;
     static int[][] map;
     static int[] dx = {-1,1,0,0};
@@ -57,7 +55,6 @@ public class Main_벽부수고이동하기_2206 {
                 if(nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
                 if(visited[sx][sy][0]) {
                     if(visited[nx][ny][0]) continue;
-                    //System.out.println(nx + " " + ny + " " + (sd + 1));
                     if(map[nx][ny] == 1) {
                         visited[nx][ny][1] = true;
                     } else {
@@ -65,7 +62,6 @@ public class Main_벽부수고이동하기_2206 {
                     }
                 } else if(visited[sx][sy][1]) {
                     if(visited[nx][ny][1]) continue;
-                    //System.out.println(nx + " " + ny + " " + (sd + 1));
                     if(map[nx][ny] == 1) {
                         continue;
                     } else {
@@ -89,5 +85,6 @@ public class Main_벽부수고이동하기_2206 {
     public static void main(String[] args) throws IOException {
         input();
         solve();
+        bufferedReader.close();
     }
 }
