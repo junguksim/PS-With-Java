@@ -1,5 +1,6 @@
 package boj.DP;
 import java.io.*;
+import java.util.Arrays;
 
 public class Main_1로만들기2_12852 {
     static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -13,6 +14,7 @@ public class Main_1로만들기2_12852 {
             return;
         }
         int[] dp = new int[N+1];
+        dp[N] = 0;
         dp[1] = 0;
         dp[2] = 1;
         int i = 3;
