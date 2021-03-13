@@ -2,65 +2,39 @@
 import java.util.Scanner;
 
 public class GoodMorning {
-
-
-    static int N,R; //N:입력받을 데이터 수 R:선택할 데이터 수
-    static int[] input,res; //input:입력데이터저장    res:결과데이터저장
-
+    static int N, R = 2;
+    static int[] nums;
     public static void main(String[] args) {
+        System.out.print("입력할 갯수 : ");
         Scanner sc = new Scanner(System.in);
         N = sc.nextInt();
-        R = sc.nextInt();
-        input = new int[N];
-        res = new int[R];
-
-        for (int i = 0; i < N; i++) {
-            input[i] = sc.nextInt();
+        nums = new int[N];
+        for(int i = 0 ; i < N; i++) {
+            nums[i] = sc.nextInt();
         }
-//      1. input배열에서 R개의 수를 뽑아서 만들 수 있는 순열을 모두 출력하시오.
-        System.out.println("----- 순열 -----");
+        System.out.println("1. 조합의 결과");
+        makeCombination(0,0,new int[R]);
+        System.out.println("2. 순열의 결과");
         makePermutation(0, new int[N], new boolean[N]);
-
-//      2. input배열에서 R개의 수를 뽑아서 만들 수 있는 조합을 모두 출력하시오.
-        System.out.println("----- 조합 -----");
-        makeCombination(0,0, new int[N]);
-
-
-//      3. input배열로 구성할 수 있는 모든 부분집합을 출력하시오.
-        System.out.println("----- 부분집합 -----");
+        System.out.println("3. 부분집합의 결과");
         makeSubset(0, new boolean[N]);
-
-        sc.close();
-    }//main
-    private static void makeSubset(int cnt, boolean[] isSelected) {
-        if(cnt == N) {
-            for(int i = 0; i < N;i++) {
-                if(isSelected[i]) System.out.print(input[i] + " ");
-            }
-            System.out.println();
-            return;
-        }
-        isSelected[cnt] = true;
-        makeSubset(cnt+1, isSelected);
-        isSelected[cnt] = false;
-        makeSubset(cnt+1, isSelected); // 부분집합은 for문 들어가지 않음!!!!!!!
     }
 
-    private static void makeCombination(int cnt, int start ,int[] arr) {
+    private static void makeCombination(int cnt, int start, int[] arr) {
         if(cnt == R) {
-            for(int i = 0; i < R; i++) {
+            for(int i = 0 ; i < R; i++) {
                 System.out.print(arr[i] + " ");
             }
             System.out.println();
             return;
         }
         for(int i = start; i < N; i++) {
-            arr[cnt] = input[i];
-            makeCombination(cnt+1, i+1, arr);
+            arr[cnt] = nums[i];
+            makeCombination(cnt+1, start+1, arr);
         }
     }
 
-    static void makePermutation(int cnt, int[] arr, boolean[] visited) {
+    private static void makePermutation(int cnt, int[] arr, boolean[] visited) {
         if(cnt == N) {
             for(int i = 0 ; i < N; i++) {
                 if(visited[i]) System.out.print(arr[i] + " ");
@@ -70,11 +44,24 @@ public class GoodMorning {
         }
         for(int i = 0 ; i < N; i++) {
             if(visited[i]) continue;
-            visited[i]=true;
-            arr[cnt] = input[i];
-            makePermutation(cnt+1, arr, visited);
+            visited[i] = true;
+            arr[cnt] = nums[i];
+            makePermutation(cnt + 1, arr, visited);
             visited[i] = false;
         }
     }
 
+    private static void makeSubset(int cnt, boolean[] isSelected) {
+        if(cnt == N) {
+            for(int i = 0 ; i < N; i++) {
+                if(isSelected[i]) System.out.print(nums[i] + " ");
+            }
+            System.out.println();
+            return;
+        }
+        isSelected[cnt] = true;
+        makeSubset(cnt+1, isSelected);
+        isSelected[cnt] = false;
+        makeSubset(cnt + 1, isSelected);
+    }
 }
