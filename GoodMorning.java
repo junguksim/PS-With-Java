@@ -30,7 +30,7 @@ public class GoodMorning {
         }
         for(int i = start; i < N; i++) {
             arr[cnt] = nums[i];
-            makeCombination(cnt+1, start+1, arr);
+            makeCombination(cnt+1, i+1, arr);
         }
     }
 
