@@ -1,8 +1,5 @@
 package boj.브루트포스;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main_스타트와링크_14889 {
