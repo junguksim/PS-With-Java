@@ -149,7 +149,7 @@ public class Main_청소년상어_19236 {
                 // 다음 위치에 물고기가 있다면,
                 // 먹고 가는 경우로 하나 보낸다.
                 Shark ateShark = new Shark(sx, sy, mapClone[sx][sy].dir, shark.sum + mapClone[sx][sy].number);
-                eatFish(mapClone, fishes, sx, sy);
+                //eatFish(mapClone, fishes, sx, sy);
 
             }
 
@@ -190,7 +190,7 @@ public class Main_청소년상어_19236 {
 
     private static void solve() throws IOException {
         shark = new Shark(0,0, 0, 0);
-        eatFish(0,0);
+        //eatFish(0,0);
         System.out.println(fishes);
         printMap();
         swapFish(map[0][1], map[1][1]);
