@@ -110,7 +110,7 @@ public class Main_청소년상어_19236 {
             int nx = fish.x + dx[fish.dir];
             int ny = fish.y + dy[fish.dir];
             int rotateCount = 0;
-            while (nx < 0 || ny < 0 || nx >= 4 || ny >= 4 || (nx == shark.x && ny == shark.y) || rotateCount < 8) {
+            while ((nx < 0 || ny < 0 || nx >= 4 || ny >= 4 )|| (nx == shark.x && ny == shark.y) || rotateCount < 8) {
                 //다음 칸이 바깥이거나, 상어가 아니게 될 때까지
                 fish.dir = (fish.dir + 1) % 8;
                 rotateCount++;
@@ -123,9 +123,8 @@ public class Main_청소년상어_19236 {
                 map[nx][ny] = fish;
                 fish.x = nx;
                 fish.y = ny;
-            }{
-                swapFish(fish, map[nx][ny]);
             }
+            swapFish(fish, map[nx][ny]);
         }
     }
 
@@ -189,12 +188,12 @@ public class Main_청소년상어_19236 {
     }
 
     private static void solve() throws IOException {
-        shark = new Shark(0,0, 0, 0);
-        //eatFish(0,0);
-        System.out.println(fishes);
         printMap();
-        swapFish(map[0][1], map[1][1]);
-        System.out.println(fishes);
+        //eatFish();
+        printMap();
+        fishMove();
+        printMap();
+        fishMove();
         printMap();
     }
 
