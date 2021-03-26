@@ -62,31 +62,32 @@ public class Main_연구소_14502 {
 
 
     static void bfs(boolean[][] visited, int[][] map) {
-        Queue<Node> queue = new LinkedList<>(viruses);
-        while (!queue.isEmpty()) {
-            Node start = queue.poll();
-            int sx = start.x;
-            int sy = start.y;
-            visited[sx][sy] = true;
+        Deque<Node> deque = new ArrayDeque<>(viruses);
+        for(int i = 0; i < viruses.size(); i++) {
+            Node virus = viruses.get(i);
+            visited[virus.x][virus.y] = true;
+        }
+        while (!deque.isEmpty()) {
+            Node node = deque.poll();
+            int sx = node.x;
+            int sy = node.y;
             for(int i = 0 ; i < 4; i++) {
                 int nx = sx + dx[i];
                 int ny = sy + dy[i];
                 if(nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
                 if(visited[nx][ny] || map[nx][ny] != 0) continue;
-                visited[nx][ny] =true;
-                queue.add(new Node(nx, ny));
                 map[nx][ny] = 2;
+                visited[nx][ny] = true;
+                deque.offer(new Node(nx, ny));
             }
         }
-        int count = 0;
+        int safeZone = 0;
         for(int i = 0 ; i < N; i++) {
             for(int j = 0 ; j < M; j++) {
-                if(map[i][j] == 0) {
-                    count++;
-                }
+                if(map[i][j] == 0) safeZone++;
             }
         }
-        ans = Math.max(ans, count);
+        ans = Math.max(safeZone, ans);
     }
 
     static void solve() {
