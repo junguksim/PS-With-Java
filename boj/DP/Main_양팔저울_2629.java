@@ -46,14 +46,7 @@ public class Main_양팔저울_2629 {
             weights[i] = Integer.parseInt(weightsInput.nextToken());
             weightsSum += weights[i];
         }
-        possibles = new TreeSet<>(new Comparator<Possible>() {
-
-            @Override
-            public int compare(Possible o1, Possible o2) {
-                return o1.weight - o2.weight;
-            }
-
-        });
+        possibles = new TreeSet<>((o1, o2) -> o1.weight - o2.weight);
         possibleWeights = new boolean[weightsSum+1];
         int possibleCount = 0;
         for(int i = 0; i < weightsCount ; i++) {
