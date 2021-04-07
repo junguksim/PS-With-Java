@@ -1,4 +1,4 @@
-package boj.BFS_DFS;
+package boj.그래프;
 import java.io.*;
 import java.util.*;
 
