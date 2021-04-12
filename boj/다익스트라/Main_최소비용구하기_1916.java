@@ -1,4 +1,4 @@
-package boj;
+package boj.다익스트라;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
