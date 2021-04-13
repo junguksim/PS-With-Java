@@ -1,6 +1,7 @@
 package boj.BFS_DFS;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
@@ -10,29 +11,32 @@ public class Main_레이저통신_6087 {
     private static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     private static int W, H, answer = Integer.MAX_VALUE;
     private static char[][] map;
-    private static boolean[][][] visited;
-    private static Node start, end;
+    private static int[][] mirrors;
+    private static ArrayList<Node>  laser;
     private static int[] dx = {-1,0,1,0};
     private static int[] dy = {0,1,0,-1};
 
     private static class Node {
         int x;
         int y;
-        int mirror;
+        int dir;
+        int count;
+
+        public Node(int x, int y, int dir, int count) {
+            this.x = x;
+            this.y = y;
+            this.dir = dir;
+            this.count = count;
+        }
 
         @Override
         public String toString() {
             return "Node{" +
                     "x=" + x +
                     ", y=" + y +
-                    ", mirror=" + mirror +
+                    ", dir=" + dir +
+                    ", count=" + count +
                     '}';
-        }
-
-        public Node(int x, int y, int mirror) {
-            this.x = x;
-            this.y = y;
-            this.mirror = mirror;
         }
     }
 
@@ -41,23 +45,18 @@ public class Main_레이저통신_6087 {
         W = Integer.parseInt(wh.nextToken());
         H = Integer.parseInt(wh.nextToken());
         map = new char[H][W];
-        visited = new boolean[H][W][2];
+        mirrors = new int[H][W];
+        laser = new ArrayList<>();
         int c = 0;
         for(int i =  0 ; i < H ; i++) {
             map[i] = bufferedReader.readLine().toCharArray();
             for(int j = 0; j < W; j++) {
+                mirrors[i][j] = Integer.MAX_VALUE;
                 if(map[i][j] == 'C') {
-                    if(c == 0) {
-                        start = new Node(i, j, 0);
-                        c++;
-                    } else {
-                        end = new Node(i, j, 0);
-                    }
+                    laser.add(new Node(i, j , -1 ,0));
                 }
             }
         }
-        System.out.println(start.toString());
-        System.out.println(end.toString());
     }
 
     private static char[][] cloneMap() {
@@ -87,46 +86,33 @@ public class Main_레이저통신_6087 {
 
     private static void bfs() {
         Queue<Node> queue = new LinkedList<>();
-        visited[start.x][start.y][0] = true;
+        Node start = laser.get(0);
+        Node end = laser.get(1);
         queue.add(start);
+        mirrors[start.x][start.y] = 0;
         while (!queue.isEmpty()) {
-            Node s = queue.poll();
-            int sx = s.x;
-            int sy = s.y;
-            System.out.println(sx + " " + sy);
-            int sm = s.mirror;
-
+            Node node = queue.poll();
+            int sx = node.x;
+            int sy = node.y;
+            int sDir = node.dir;
+            int sCount = node.count;
             if(sx == end.x && sy == end.y) {
-                answer = Math.min(sm, answer);
-                continue;
+                answer = Math.min(sCount, answer);
             }
             for(int i = 0 ; i < 4; i++) {
                 int nx = sx + dx[i];
                 int ny = sy + dy[i];
-                if(nx < 0 || ny < 0 || nx >= H || ny >= W) {
-                   continue;
+                int nd = i;
+                if(nx < 0 || ny < 0 || nx >= H || ny >= W || map[nx][ny]=='*') continue;
+                int temp = sCount;
+                if(sDir != nd && sDir != -1) {
+                    temp++;
                 }
-                if(map[nx][ny] == '*') continue;
-                if(visited[sx][sy][0]) {
-                    visited[nx][ny][0] = true;
-                } else if(visited[sx][sy][1]) {
-
-                }
-
-                int nnx = nx + dx[i];
-                int nny = ny + dy[i];
-                if(nnx < 0 || nny < 0 || nnx >= H || nny >= W) {
-                    nnx = nx + dx[turnLeft(i)];
-                    nny = ny + dy[turnLeft(i)];
-                    System.out.println("왼쪽으로 꺾으면 " + nnx + " " + nny + " 에 도착");
-                    queue.add(new Node(nnx, nny, sm + 1));
-                    nnx = nx +dx[turnRight(i)];
-                    nny = ny + dy[turnRight(i)];
-                    System.out.println("오른쪽으로 꺾으면 " + nnx + " " + nny + " 에 도착");
-                    queue.add(new Node(nnx, nny, sm + 1));
+                if(mirrors[nx][ny] < temp) {
                     continue;
                 }
-                queue.add(new Node(nx, ny, sm + 1));
+                mirrors[nx][ny] = temp;
+                queue.add(new Node(nx, ny, nd, temp));
             }
         }
     }
