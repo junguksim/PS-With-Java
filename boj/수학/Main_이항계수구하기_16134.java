@@ -1,7 +1,9 @@
+package boj.수학;
+
 import java.io.*;
 import java.util.StringTokenizer;
 
-public class Main {
+public class Main_이항계수구하기_16134 {
     private static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     private static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     private static int N,R;

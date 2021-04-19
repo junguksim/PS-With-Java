@@ -1,19 +1,23 @@
+package swea;
 import java.io.*;
 import java.util.StringTokenizer;
 
-public class Main {
+public class Solution_professional_조합 {
     private static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     private static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     private static int N,R;
-    private static long P = 1000000007;
+    private static long P = 1234567891;
     private static long[] fact;
     public static void main(String[] args) throws IOException  {
-        input();
-        solve();
+        int T = Integer.parseInt(bufferedReader.readLine());
+        for(int i = 1; i <= T; i++) {
+            input();
+            solve(i);
+        }
         bufferedReader.close();
         bufferedWriter.close();
     }
-
+    
     private static void input() throws IOException {
         StringTokenizer nr = new StringTokenizer(bufferedReader.readLine());
         N = Integer.parseInt(nr.nextToken());
@@ -27,12 +31,12 @@ public class Main {
 
     private static long power(long x, long y) {
         if(y == 0) return 1;
-        if(y % 2 == 1) return (power(x, y-1) * x) % P;
+        if(y % 2 == 1) return (power(x, y-1) * x) % 1234567891L;
         long half = power(x, y/2) % P;
         return half * half % P;
     }
 
-    private static void solve() throws IOException {
+    private static void solve(int t) throws IOException {
         long ans = 0;
         long[] inverse = new long[N+1];
         inverse[N] = power(fact[N], P-2);
@@ -42,6 +46,6 @@ public class Main {
         long top = fact[N];
         long bottom = (inverse[N-R] * inverse[R]) % P;
         ans = top * bottom % P;
-        System.out.println(ans);
+        bufferedWriter.write("#"+t+" "+ans+"\n");
     }
 }
