@@ -133,40 +133,27 @@ public class Main_감시_15683 {
         }
     }
 
-    private static void solve() throws IOException {
-        answer = getEdgeCount(map);
-        Queue<Camera> queue = new LinkedList<>(cameras);
-        int cnt = 0;
-        while (cnt < cameras.size()) {
-            int[][] newMap = copyMap(map);
-            for(Camera c : cameras) {
-                int min = Integer.MAX_VALUE;
-                int[][] leastEdgeMap = copyMap(newMap);
-                //System.out.println("실행전 : " + getEdgeCount(leastEdgeMap));
-                //printMap(leastEdgeMap);
-                for(int i = 0 ; i < 4; i++) {
-                    int[] nextDir = d[c.type][i];
-                    int[][] beforeFourShow = copyMap(newMap);
-                    for(int j = 0 ; j < nextDir.length; j++) {
-                        show(beforeFourShow, c.x, c.y, nextDir[j]); // 볼 방향 다 보고 나서
-                    }
-                    int edges = getEdgeCount(beforeFourShow); // 사각지대 구하고
-                    //System.out.println(edges);
-                    //printMap(beforeFourShow);
-                    if(min >= edges) {
-                        leastEdgeMap = copyMap(beforeFourShow);
-                        min = edges;
-                    }
-                } // 해당 카메라를 다 보고 나면,
-                newMap = copyMap(leastEdgeMap);
-            }
-            int edgeCount = getEdgeCount(newMap);
-            answer = Math.min(answer, edgeCount);
-            queue.add(queue.poll());
-            cnt++;
-            cameras = new ArrayList<>(queue);
+    private static void dfs(int idx, int[][] map) {
+        if(idx == cameras.size()) {
+            answer = Math.min(answer, getEdgeCount(map));
+            return;
         }
+        Camera camera = cameras.get(idx);
+        int x = camera.x;
+        int y = camera.y;
+        int[][] newMap = new int[N][M];
+        for(int i = 0 ; i < 4 ; i++) {
+            int[] next = d[camera.type][i];
+            newMap = copyMap(map);
+            for(int j = 0; j < next.length; j++) {
+                show(newMap, x, y, next[j]);
+            }
+            dfs(idx + 1, newMap);
+        }
+    }
 
+    private static void solve() throws IOException {
+        dfs(0, map);
         System.out.println(answer);
     }
 }
