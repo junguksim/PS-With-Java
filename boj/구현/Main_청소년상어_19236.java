@@ -1,65 +1,55 @@
 package boj.구현;
+
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
-/**
- * 4x4 고정
- * 0,0 에 있던 물고기를 먹고 시작, 첫 방향은 0,0에 있던 물고기의 방향
- * 물고기 이동- 상어이동 반복
- * 물고기 이동
- * 1. 번호가 작은 물고기부터
- * 2. 한 칸만 이동 가능
- * 3. 이동 가능 -> 빈칸, 다른물고기가 있는 칸
- * 4. 이동 불가 -> 바깥이나, 상어가 있는 칸
- * 5. 이동할 수 있는 칸으로 향할 수 있을 때 까지 방향을 45도, "반시계"
- * 6. 이동할 수 있는 칸이 없다면 이동하지 않음.
- * 7. 다른 물고기가 있는 칸으로 이동할 때는 해당 물고기와 위치를 바꿈
- *
- * 상어 이동
- * 1. 방향에 있는 칸으로 이동 가능.
- * 2. 여러 개의 칸 이동 가능.
- * 3. 물고기가 있다면 그 칸의 물고기를 먹고, 그 물고기의 방향을 가지게 된다.
- * 4. 이동 중에 지나가는 칸의 물고기는 먹지 않는다.
- * 5. 물고기가 없는 칸으로는 이동 불가
- * 6. 이동 가능한 칸이 없다면 집으로 간다.
- * 
- * ANSWER : 먹을 수 있는 물고기 번호의 합의 최대
- *
- */
 public class Main_청소년상어_19236 {
     private static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     private static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
-    static int[] dx = {-1,-1,0,1,1,1,0,-1};
-    static int[] dy = {0,-1,-1,-1,0,1,1,1};
-    static Fish[][] map;
-    static ArrayList<Fish> fishes;
-    static Shark shark;
-    static class Node {
+    private static int[] dx = {0,-1,-1,0,1,1,1,0,-1};
+    private static int[] dy = {0,0,-1,-1,-1,0,1,1,1};
+    private static int[][] fishNums;
+    private static int[][] fishDirs;
+    private static Node shark;
+    private static ArrayList<Fish> fishes;
+    private static int ans;
+
+    private static class Node {
         int x;
         int y;
+        int d;
 
-        public Node(int x, int y) {
+        public Node(int x, int y, int d) {
             this.x = x;
             this.y = y;
+            this.d = d;
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    ", d=" + d +
+                    '}';
         }
     }
 
     private static class Fish extends Node implements Comparable<Fish>{
-        int number;
-        int dir;
+        int no;
+        boolean alive;
 
-        public Fish(int x, int y, int number, int dir) {
-            super(x, y);
-            this.number = number;
-            this.dir = dir;
+        public Fish(int x, int y, int d, int no, boolean alive) {
+            super(x, y, d);
+            this.no = no;
+            this.alive = alive;
         }
 
         @Override
         public int compareTo(Fish o) {
-            return this.number - o.number;
+            return this.no - o.no;
         }
 
         @Override
@@ -67,138 +57,154 @@ public class Main_청소년상어_19236 {
             return "Fish{" +
                     "x=" + x +
                     ", y=" + y +
-                    ", number=" + number +
-                    ", dir=" + dir +
+                    ", d=" + d +
+                    ", no=" + no +
+                    ", alive=" + alive +
                     '}';
         }
     }
+    // 0,0 물고기 먹고 시작 -> 0,0 의 물고기의 방향을 가짐
+    // 물고기 이동
+    // 물고기는 한 칸 이동, (빈칸, 다른 물고기가 있는 칸은 이동 가능, 상어 있는 칸 이동 불가)
+    // 이동할 수 있는 칸을 향할 때 까지 45도 반시계 회전
+    // 이동할 수 있는 칸이 없으면 이동하지 않는다.
+    // 다른 물고기 있는 칸으로 이동할 때 서로의 위치 바꿈
 
-    private static class Shark extends Node {
-        int dir;
-        int sum;
-
-        public Shark(int x, int y, int dir, int sum) {
-            super(x, y);
-            this.dir = dir;
-            this.sum = sum;
-        }
-    }
-
-    private static void swapFish(Fish f1, Fish f2) {
-        int f1Idx = 0;
-        int f2Idx = 0;
-        for(int i = 0 ; i < fishes.size(); i++) {
-            if(fishes.get(i).equals(f1)) {
-                f1Idx = i;
-            } else if(fishes.get(i).equals(f2)) {
-                f2Idx = i;
-            }
-        }
-        fishes.set(f1Idx, new Fish(f1.x, f1.y, f2.number, f2.dir));
-        fishes.set(f2Idx, new Fish(f2.x, f2.y, f1.number, f1.dir));
-        int x1 = f1.x;
-        int y1 = f1.y;
-        int x2 = f2.x;
-        int y2 = f2.y;
-        map[x2][y2] = f1;
-        map[x1][y1] = f2;
-    }
-
-    private static void fishMove() {
-        for(int i = 0; i < fishes.size(); i++) { // 번호가 작은 물고기 부터
-            Fish fish = fishes.get(i);
-            int nx = fish.x + dx[fish.dir];
-            int ny = fish.y + dy[fish.dir];
-            int rotateCount = 0;
-            while ((nx < 0 || ny < 0 || nx >= 4 || ny >= 4 )|| (nx == shark.x && ny == shark.y) || rotateCount < 8) {
-                //다음 칸이 바깥이거나, 상어가 아니게 될 때까지
-                fish.dir = (fish.dir + 1) % 8;
-                rotateCount++;
-            }
-            if(rotateCount > 8) {
-                continue;
-            }
-            if(map[nx][ny] == null) {
-                // 빈 칸이면 그냥 이동
-                map[nx][ny] = fish;
-                fish.x = nx;
-                fish.y = ny;
-            }
-            swapFish(fish, map[nx][ny]);
-        }
-    }
-
-    private static void eatFish(Fish[][] mapClone, ArrayList<Fish> fishes, Shark shark, int x, int y) {
-        shark.dir = mapClone[x][y].dir;
-        shark.sum += mapClone[x][y].number;
-        fishes.remove(map[x][y]);
-        mapClone[x][y] = null;
-    }
-
-    private static void sharkMove(Fish[][] mapClone, ArrayList<Fish> fishes, Shark shark, int sum) {
-        int sx = shark.x;
-        int sy = shark.y;
-        int nx = sx + dx[shark.dir];
-        int ny = sy + dy[shark.dir];
-
-        while (!(nx < 0 || ny < 0 || nx >= 4 || ny >= 4)) {
-            sx = nx;
-            sy = ny;
-            if(mapClone[sx][sy] != null) {
-                // 다음 위치에 물고기가 있다면,
-                // 먹고 가는 경우로 하나 보낸다.
-                Shark ateShark = new Shark(sx, sy, mapClone[sx][sy].dir, shark.sum + mapClone[sx][sy].number);
-                //eatFish(mapClone, fishes, sx, sy);
-
-            }
-
-            nx = sx + dx[shark.dir];
-            ny = sy + dy[shark.dir];
-        }
-    }
-
-
-    private static void input() throws IOException {
-        map = new Fish[4][4];
-        fishes = new ArrayList<>();
-        for(int i = 0 ; i < 4; i++) {
-            StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
-            for(int j = 0 ; j < 4; j++) {
-                Fish fish = new Fish(i,j,Integer.parseInt(st.nextToken()) , Integer.parseInt(st.nextToken()) - 1);
-                map[i][j] = fish;
-                fishes.add(fish);
-            }
-        }
-        Collections.sort(fishes);
-        System.out.println(fishes);
-    }
-
-    private static void printMap() {
-        for(int i = 0 ; i < 4; i++) {
-            for(int j = 0 ; j < 4; j++) {
-                if(map[i][j] == null) {
-                    System.out.print("0 ");
-                }
-                else {
-                    System.out.print(map[i][j].number + " ");
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    private static void solve() throws IOException {
-        printMap();
-        //eatFish();
-        printMap();
-        fishMove();
-        printMap();
-        fishMove();
-        printMap();
-    }
+    // 상어 이동
+    // 방향에 있는 칸으로, 여러 개의 칸 이동 가능
+    // 물고기가 있다면 먹고, 그 물고기의 방향을 가짐.
+    // 지나가는 칸의 물고기는 먹지 않고, 물고기가 없는 칸으로 이동 불가
+    // 이동할 수 있는 칸이 없으면 끝!
 
     public static void main(String[] args) throws IOException {
         input();
         solve();
+    }
+
+    private static void input() throws IOException {
+        fishNums = new int[4][4];
+        fishDirs = new int[4][4];
+        fishes = new ArrayList<>();
+        for(int i = 0 ; i < 4; i++) {
+            StringTokenizer st = new StringTokenizer(bufferedReader.readLine());
+            for(int j = 0 ; j < 8; j++) {
+                if(j % 2 == 0) {
+                    fishNums[i][j / 2] = Integer.parseInt(st.nextToken());
+                } else {
+                    fishDirs[i][j / 2] = Integer.parseInt(st.nextToken());
+                }
+            }
+        }
+        for(int i = 0 ; i < 4; i++) {
+            for(int j = 0 ; j < 4; j++) {
+                fishes.add(new Fish(i,j,fishDirs[i][j], fishNums[i][j], true));
+            }
+        }
+        Collections.sort(fishes);
+    }
+
+    private static boolean inRange(int nx, int ny) {
+        return nx >= 0 && nx < 4 && ny >= 0 && ny < 4;
+    }
+
+    private static ArrayList<Fish> getNextCanEatFishes(Node shark, int[][] fishNums, int[][] fishDirs, ArrayList<Fish> fishes) {
+        int sx = shark.x;
+        int sy = shark.y;
+        int sd = shark.d;
+        int nx = sx;
+        int ny = sy;
+        ArrayList<Fish> nextFishes = new ArrayList<>();
+        while (inRange(nx, ny)) {
+            nx += dx[sd];
+            ny += dy[sd];
+            if(inRange(nx, ny) && fishNums[nx][ny] > 0) {
+                nextFishes.add(new Fish(nx, ny, fishDirs[nx][ny], fishNums[nx][ny], fishes.get(fishNums[nx][ny] - 1).alive));
+            }
+        }
+        return nextFishes;
+    }
+
+    private static void swap(int[][] arr, int ax, int ay, int bx, int by) {
+        int temp = arr[ax][ay];
+        arr[ax][ay] = arr[bx][by];
+        arr[bx][by] = temp;
+    }
+
+    private static void moveFishes(int[][] fishNums, int[][] fishDirs, ArrayList<Fish> fishes) {
+        for(Fish fish : fishes) {
+            if(!fish.alive) continue;
+            int fx = fish.x;
+            int fy = fish.y;
+            int fd = fish.d;
+            int rotateCount = 0;
+            while (rotateCount < 8) {
+                int nx = fx + dx[fd];
+                int ny = fy + dy[fd];
+                if(!inRange(nx, ny) || fishNums[nx][ny] == -1) {
+                    fd = (fd + 1) % 9;
+                    if(fd == 0) fd = 1;
+                    rotateCount++;
+                } else {
+                    int swapFishNum = fishNums[nx][ny];
+                    if(swapFishNum != 0) {
+                        fishes.set(swapFishNum - 1, new Fish(fx, fy, fishDirs[nx][ny], swapFishNum, fishes.get(swapFishNum - 1).alive));
+                    }
+                    fishes.set(fish.no - 1, new Fish(nx, ny, fd, fish.no, fish.alive));
+                    fishDirs[fx][fy] = fd;
+                    swap(fishNums, fx, fy, nx, ny);
+                    swap(fishDirs, fx, fy, nx, ny);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int sharkEats(Node shark, Fish nextFish, int[][] fishNums, int[][] fishDirs, ArrayList<Fish> fishes) {
+        int sum = 0;
+        sum += nextFish.no;
+        int sx = shark.x;
+        int sy = shark.y;
+        int nx = nextFish.x;
+        int ny = nextFish.y;
+        fishes.set(nextFish.no-1, new Fish(nextFish.x, nextFish.y, fishDirs[nx][ny], fishNums[nx][ny], false));
+        fishNums[nx][ny] = -1;
+        fishNums[sx][sy] = 0;
+        return sum;
+    }
+
+    private static int[][] clone(int[][] arr) {
+        int[][] next = new int[4][4];
+        for(int i = 0 ; i < 4; i++) {
+            next[i] = arr[i].clone();
+        }
+        return next;
+    }
+
+    private static void dfs(Node shark, int[][] fishNums, int[][] fishDirs, ArrayList<Fish> fishes, int answer) {
+        ArrayList<Fish> nextFishes = getNextCanEatFishes(shark, fishNums, fishDirs, fishes);
+        if(nextFishes.size() == 0) {
+            ans = Math.max(ans, answer);
+            return;
+        }
+        for(Fish fish : nextFishes) {
+            int[][] fNums = clone(fishNums);
+            int[][] fDirs = clone(fishDirs);
+            ArrayList<Fish> cFishes = new ArrayList<>(fishes);
+            Node nShark = new Node(shark.x, shark.y, shark.d);
+            int eatNo = sharkEats(nShark, fish, fNums, fDirs, cFishes);
+            nShark = new Node(fish.x, fish.y, fDirs[fish.x][fish.y]);
+            moveFishes(fNums, fDirs, cFishes);
+            dfs(nShark, fNums, fDirs, cFishes, answer + eatNo);
+        }
+    }
+
+    private static void solve() throws IOException {
+        int eatNo = fishNums[0][0];
+        fishes.set(fishNums[0][0] - 1, new Fish(0,0,fishDirs[0][0], fishNums[0][0], false));
+        fishNums[0][0] = -1;
+        shark = new Node(0,0, fishDirs[0][0]);
+        moveFishes(fishNums, fishDirs, fishes);
+        dfs(shark, fishNums, fishDirs, fishes, eatNo);
+        System.out.println(ans);
     }
 }
