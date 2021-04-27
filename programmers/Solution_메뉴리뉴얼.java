@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Solution_메뉴리뉴얼 {
-    private static int[] howManyOrdered;
+    private static int[] howManyOrdered; //수정
     private static ArrayList<Character> possibleMenus;
     private static ArrayList<String> result;
     private static int beforeCourse;
