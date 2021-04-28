@@ -10,7 +10,6 @@ public class Main_PuyoPuyo_11559 {
     private static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
     private static char[][] map;
     private static ArrayList<Node> puyos;
-    private static boolean[][] picked;
     private static int[] dx = {-1,1,0,0};
     private static int[] dy = {0,0,-1,1};
     private static boolean canBoom;
@@ -34,7 +33,6 @@ public class Main_PuyoPuyo_11559 {
     private static void input() throws IOException {
         map = new char[12][6];
         puyos = new ArrayList<>();
-        picked = new boolean[12][6];
         for(int i = 0; i < 12; i++) {
             char[] line = bufferedReader.readLine().toCharArray();
             for(int j = 0 ; j < 6; j++) {
@@ -58,7 +56,6 @@ public class Main_PuyoPuyo_11559 {
                 }
             }
         }
-        //printMap();
         findWillBoomPuyos();
     }
 
@@ -71,15 +68,6 @@ public class Main_PuyoPuyo_11559 {
             }
         }
         shiftToDown();
-    }
-
-    private static void printMap() {
-        for(int i = 0 ; i < 12; i++) {
-            for(int j = 0 ; j < 6; j++) {
-                System.out.print(map[i][j]);
-            }
-            System.out.println();
-        }
     }
 
     private static void findWillBoomPuyos() {
@@ -118,23 +106,7 @@ public class Main_PuyoPuyo_11559 {
         }
         if(!canBoom) return;
         answer++;
-//        for(int i = 0 ; i < 12; i++) {
-//            for(int j = 0 ; j < 6; j++) {
-//                if(willBoom[i][j]) System.out.print("O ");
-//                else System.out.print("X ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println();
         boom(willBoom);
-    }
-
-    private static char[][] cloneMap() {
-        char[][] result = new char[12][6];
-        for(int i = 0 ; i < 12; i++) {
-            result[i] = map[i].clone();
-        }
-        return result;
     }
 
     private static void solve() throws IOException {
