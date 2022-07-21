@@ -1,9 +1,6 @@
 package boj.조합론;
 
-import org.omg.PortableInterceptor.INACTIVE;
-
 import java.io.*;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class boj_로또_심정욱 {
